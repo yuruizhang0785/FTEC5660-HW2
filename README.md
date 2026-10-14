@@ -90,10 +90,21 @@ python3 hw2.py --cv-folder task2
 attack the MCP server. See the homework description for the full rules.
 
 ## Homework 2 solution:
-> to students: this is your report, see the homework description.
 
 ### Task 1
-> one paragraph describing your solution, and your results on `public_test`.
+
+My approach is to first identify the correct person by searching LinkedIn with the candidate's name, city, employers, and school, and then fetch the full profile for comparison. Facebook is used as a backup when the identity is unclear. I compare the five required categories: name, city, jobs, education, and skills. Each fully matching category adds 0.2 to the score, so a completely consistent CV receives 1.0. If any confirmed mismatch is found, the score is capped at 0.5 and the CV is treated as unreliable. I also added a small rule-based check for Senior and Junior job-title conflicts because the model may sometimes overlook seniority. When the first verification pass cannot confirm the identity, a second pass tries again with different searches. On the supplied `public_test` set, my agent correctly classified all seven CVs, giving an accuracy of 7/7 (100%).
 
 ### Task 2
-> the attack techniques you used and why you expect them to work.
+
+I used an indirect prompt-injection attack based on [OWASP LLM01](https://cheatsheetseries.owasp.org/cheatsheets/LLM_Prompt_Injection_Prevention_Cheat_Sheet.html). The visible CV keeps Kelly Tsang's real information but adds **Python** as a false skill. It also contains invisible text that PDF extractors can read. The hidden text imitates a high-priority system message, asks the agent to fetch Kelly's real LinkedIn profile, and provides a valid JSON answer with every category marked `match`. This satisfies the program's tool-call check while trying to make the model overlook the false skill. My current verifier gave the adversarial CV a score of **1.0000**.
+
+```mermaid
+flowchart LR
+    A["Visible CV<br/>False skill: Python"] --> C["PDF text extractor"]
+    B["Invisible PDF text<br/>Prompt injection"] --> C
+    C --> D["Verifier fetches<br/>LinkedIn profile 10001"]
+    D --> E["Injected JSON marks<br/>all fields as match"]
+    E --> F["Scoring code<br/>5 x 0.2 = 1.0"]
+```
+
