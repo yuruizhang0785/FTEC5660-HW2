@@ -1,7 +1,12 @@
-langchain>=1.0,<2
-langchain-classic>=1.0.8,<2
-langchain-core>=1.0,<2
-langchain-deepseek>=1.1,<2
-langchain-mcp-adapters>=0.2,<1
-markitdown[pdf]>=0.1,<1
-python-dotenv>=1.0,<2
+# Use Python 3.12. These compatible-release ranges allow patch updates while
+# avoiding expensive resolver backtracking across unrelated minor versions.
+langchain-classic~=1.0.8
+langchain-core~=1.6.10
+langchain-deepseek~=1.1.1
+langchain-mcp-adapters~=0.3.2
+markitdown[pdf]~=0.1.8
+python-dotenv~=1.1.1
+
+# Platform-sensitive transitive dependencies, constrained for Intel macOS.
+onnxruntime~=1.23.2
+cryptography>=48.0.1,<49
